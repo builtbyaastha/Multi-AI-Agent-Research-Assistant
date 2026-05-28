@@ -1,0 +1,57 @@
+# Core LLM + Agent Framework
+langchain
+langgraph
+langchain-community
+langchain-core
+
+# LLM Providers
+openai
+google-generativeai
+langchain-google-genai
+
+# Search API
+exa-py
+
+# Web Scraping
+beautifulsoup4
+requests
+lxml
+
+# Environment Variables
+python-dotenv
+
+# Vector Database / RAG
+chromadb
+
+# Embeddings
+sentence-transformers
+
+# Data Handling
+pandas
+numpy
+
+# Async Support
+aiohttp
+httpx
+
+# API Backend
+fastapi
+uvicorn
+
+# Tokenization / NLP
+tiktoken
+
+# Parsing / Validation
+pydantic
+
+# Logging / Utilities
+rich
+tenacity
+
+# Research Paper Support
+arxiv
+pymupdf
+
+# Optional Notebook Support
+jupyter
+ipykernel
