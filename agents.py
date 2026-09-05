@@ -1,11 +1,14 @@
-from langchain_ollama import ChatOllama
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from pydantic import BaseModel, Field, field_validator
-from typing import Literal
-from tools import WebSearch, web_scrape
 import os
+from typing import Literal
+
 from dotenv import load_dotenv
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_ollama import ChatOllama
+from pydantic import BaseModel, Field, field_validator
+
+from tools import WebSearch, web_scrape
+
 load_dotenv()
 
 # ---------------------------------------------------------------------------

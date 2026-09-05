@@ -16,7 +16,7 @@ get long enough to blow past a single embedding's useful context.
 """
 
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import chromadb
 from chromadb.utils import embedding_functions
@@ -46,14 +46,14 @@ def store_report(topic: str, report: str, quality_score: int) -> None:
     loop has finished (approved or hit max_revisions) — we don't want
     half-finished drafts polluting future retrieval.
     """
-    doc_id = f"{topic}::{datetime.now(timezone.utc).isoformat()}"
+    doc_id = f"{topic}::{datetime.now(UTC).isoformat()}"
     _collection.add(
         ids=[doc_id],
         documents=[report],
         metadatas=[{
             "topic": topic,
             "quality_score": quality_score,
-            "stored_at": datetime.now(timezone.utc).isoformat(),
+            "stored_at": datetime.now(UTC).isoformat(),
         }],
     )
 

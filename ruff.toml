@@ -1,0 +1,17 @@
+# Ruff configuration.
+#
+# exclude: .history/ is an editor's local-history snapshot folder (old
+# timestamped copies of files), not real source — it shouldn't be linted,
+# and shouldn't really be committed at all (see .gitignore).
+#
+# BLE001 / S110: this project deliberately catches broad `Exception` in
+# several places (critic_node, recall_node, store_node, run_reader) as a
+# fail-open pattern — a local LLM's structured output or a memory lookup
+# failing shouldn't crash the whole pipeline. That's an intentional
+# architecture choice, documented in code comments at each site, not an
+# oversight — so it's ignored here project-wide rather than silenced with
+# scattered `# noqa` comments.
+exclude = [".history", ".venv", ".chroma_memory", "__pycache__"]
+
+[lint]
+ignore = ["BLE001", "S110"]

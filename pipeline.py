@@ -1,7 +1,9 @@
-from typing import TypedDict, Literal
-from langgraph.graph import StateGraph, END
-from agents import run_search, run_reader, writer_chain, critic_chain
-from memory import store_report, find_related_reports, format_related_context
+from typing import Literal, TypedDict
+
+from langgraph.graph import END, StateGraph
+
+from agents import critic_chain, run_reader, run_search, writer_chain
+from memory import find_related_reports, format_related_context, store_report
 
 
 # ---------------------------------------------------------------------------

@@ -19,15 +19,14 @@ Usage:
 import argparse
 import json
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
-from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_ollama import ChatOllama
+from pydantic import BaseModel, Field
 
 from pipeline import run_research_pipeline
-
 
 # ---------------------------------------------------------------------------
 # Golden dataset
@@ -203,7 +202,7 @@ def run_eval(limit: int | None = None) -> dict:
     total = len(results)
 
     summary = {
-        "run_at": datetime.now(timezone.utc).isoformat(),
+        "run_at": datetime.now(UTC).isoformat(),
         "total": total,
         "passed": passed,
         "pass_rate": round(passed / total, 2) if total else 0,

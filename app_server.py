@@ -27,8 +27,8 @@ import queue
 import threading
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from pipeline import build_graph
 
@@ -83,7 +83,7 @@ async def _run_pipeline_streaming(topic: str, websocket: WebSocket) -> dict:
         "max_revisions": 2,
     }
 
-    q: "queue.Queue" = queue.Queue()
+    q: queue.Queue = queue.Queue()
 
     def worker():
         try:

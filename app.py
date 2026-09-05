@@ -1,5 +1,7 @@
-import streamlit as st
 import time
+
+import streamlit as st
+
 from pipeline import run_research_pipeline
 
 # ── Page config ────────────────────────────────────────────────────────────────

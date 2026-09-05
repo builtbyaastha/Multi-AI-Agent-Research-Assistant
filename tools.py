@@ -1,11 +1,11 @@
-from langchain.tools import tool
+import os
 import re
+
 import requests
 from bs4 import BeautifulSoup
-from exa_py import Exa
-import os
 from dotenv import load_dotenv
-
+from exa_py import Exa
+from langchain.tools import tool
 
 load_dotenv()
 
@@ -107,4 +107,4 @@ def web_scrape(url: str) -> str:
 
         return wrapped
     except Exception as e:
-        return f"Error scraping {url}: {str(e)}"
+        return f"Error scraping {url}: {e!s}"
