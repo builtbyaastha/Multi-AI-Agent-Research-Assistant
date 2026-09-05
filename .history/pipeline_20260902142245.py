@@ -1,7 +1,6 @@
 from typing import TypedDict, Literal
 from langgraph.graph import StateGraph, END
-from agents import run_search, run_reader, writer_chain, critic_chain
-from memory import store_report, find_related_reports, format_related_context
+from agents import build_reader_agent, build_search_agent, writer_chain, critic_chain
 
 
 # ---------------------------------------------------------------------------
@@ -9,7 +8,6 @@ from memory import store_report, find_related_reports, format_related_context
 # ---------------------------------------------------------------------------
 class ResearchState(TypedDict):
     query: str
-    related_context: str
     search_result: str
     scraped_content: str
     report: str
@@ -31,34 +29,44 @@ def _log(step: str, msg: str = "") -> None:
 # ---------------------------------------------------------------------------
 # Nodes
 # ---------------------------------------------------------------------------
-def recall_node(state: ResearchState) -> dict:
-    _log("Step 0 - Memory: Checking for related prior research")
-    try:
-        related = find_related_reports(state["query"])
-    except Exception as e:
-        print(f"[recall_node] memory lookup failed ({e}); continuing without it")
-        related = []
-
-    context = format_related_context(related)
-    if related:
-        print(f"found {len(related)} related past report(s): "
-              f"{[r['topic'] for r in related]}")
-    else:
-        print("no related prior research found (cold start or novel topic)")
-
-    return {"related_context": context}
-
-
 def search_node(state: ResearchState) -> dict:
-    _log("Step 1 - Search: Gathering recent information on the topic")
-    search_result = run_search(state["query"])
+    _log("Step 1 - Search Agent: Gathering recent information on the topic")
+    agent = build_search_agent()
+    result = agent.invoke({
+        "messages": [
+            {
+                "role": "user",
+                "content": f"Search for recent and reliable information on the topic: {state['query']}"
+            }
+        ]
+    })
+    search_result = result["messages"][-1].content
     print("search result:", search_result[:500], "...")
     return {"search_result": search_result}
 
 
 def reader_node(state: ResearchState) -> dict:
-    _log("Step 2 - Reader: Extracting relevant information from scraped sources")
-    scraped_content = run_reader(state["query"], state["search_result"])
+    _log("Step 2 - Reader Agent: Extracting relevant information from search results")
+    agent = build_reader_agent()
+    result = agent.invoke({
+        "messages": [
+            {
+                "role": "user",
+                "content": f"""Based on the following search results about '{state['query']}', extract the most relevant information that would help in writing a research summary.
+
+Focus on:
+- key findings
+- important models/methods
+- challenges
+- future directions
+
+Search Results:
+{state['search_result'][:1500]}
+"""
+            }
+        ]
+    })
+    scraped_content = result["messages"][-1].content
     print("reader result:", scraped_content[:500], "...")
     return {"scraped_content": scraped_content}
 
@@ -77,9 +85,6 @@ def writer_node(state: ResearchState) -> dict:
             f"\n\nPrevious critic feedback to address (revision {state['revision_count']}):\n"
             f"{state['feedback']}"
         )
-
-    if state.get("related_context"):
-        combined += f"\n\n{state['related_context']}"
 
     report = writer_chain.invoke({"query": state["query"], "text": combined})
     print("report draft:", report[:500], "...")
@@ -100,12 +105,7 @@ def critic_node(state: ResearchState) -> dict:
             "text": combined,
             "summary": state["report"],
         })
-        feedback, score = result.feedback, result.quality_score
-        # Derive verdict from the (validator-normalized) score in code rather
-        # than trusting the model's own verdict field — two independently
-        # generated fields from the same model call can disagree, and the
-        # score is the one we've already sanity-checked.
-        verdict = "approve" if score >= 7 else "revise"
+        feedback, score, verdict = result.feedback, result.quality_score, result.verdict
     except Exception as e:
         # Fail open rather than looping forever on a parsing/model hiccup.
         print(f"[critic_node] structured output failed ({e}); defaulting to approve")
@@ -131,40 +131,26 @@ def route_after_critic(state: ResearchState) -> str:
     return "revise"
 
 
-def store_node(state: ResearchState) -> dict:
-    _log("Step 5 - Memory: Storing finished report for future recall")
-    try:
-        store_report(state["query"], state["report"], state["quality_score"])
-        print("stored to memory")
-    except Exception as e:
-        print(f"[store_node] failed to store report ({e}); continuing anyway")
-    return {}
-
-
 # ---------------------------------------------------------------------------
 # Graph
 # ---------------------------------------------------------------------------
 def build_graph():
     graph = StateGraph(ResearchState)
 
-    graph.add_node("recall", recall_node)
     graph.add_node("search", search_node)
     graph.add_node("read", reader_node)
     graph.add_node("write", writer_node)
     graph.add_node("critique", critic_node)
-    graph.add_node("store", store_node)
 
-    graph.set_entry_point("recall")
-    graph.add_edge("recall", "search")
+    graph.set_entry_point("search")
     graph.add_edge("search", "read")
     graph.add_edge("read", "write")
     graph.add_edge("write", "critique")
     graph.add_conditional_edges(
         "critique",
         route_after_critic,
-        {"end": "store", "revise": "write"},
+        {"end": END, "revise": "write"},
     )
-    graph.add_edge("store", END)
 
     return graph.compile()
 
@@ -174,7 +160,6 @@ def run_research_pipeline(topic: str, max_revisions: int = 2) -> dict:
 
     initial_state: ResearchState = {
         "query": topic,
-        "related_context": "",
         "search_result": "",
         "scraped_content": "",
         "report": "",

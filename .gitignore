@@ -5,6 +5,8 @@ build/
 dist/
 wheels/
 *.egg-info
+.chroma_memory/
+__pycache__/
 
 # Virtual environments
 .venv

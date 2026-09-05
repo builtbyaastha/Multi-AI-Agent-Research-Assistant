@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>research-assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="terminal">
+    <header class="terminal__header">
+      <span class="terminal__title">research-assistant</span>
+      <span class="status" id="connectionStatus">
+        <span class="status__dot status__dot--offline" id="statusDot"></span>
+        <span id="statusText">connecting</span>
+      </span>
+    </header>
+
+    <form class="prompt" id="promptForm">
+      <span class="prompt__glyph">&gt;</span>
+      <input
+        type="text"
+        class="prompt__input"
+        id="topicInput"
+        placeholder="enter a research topic and press enter"
+        autocomplete="off"
+        autofocus
+      />
+      <button type="submit" class="prompt__submit" id="submitBtn">run</button>
+    </form>
+
+    <section class="panel" id="logPanel" hidden>
+      <div class="panel__label">Pipeline</div>
+      <div class="log" id="log"></div>
+    </section>
+
+    <section class="panel" id="reportPanel" hidden>
+      <div class="panel__label">Report</div>
+      <div class="report" id="report"></div>
+    </section>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
