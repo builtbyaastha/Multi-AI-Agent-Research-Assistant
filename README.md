@@ -2,7 +2,7 @@
 
 An agentic research pipeline that searches the web, reads and synthesizes sources, writes a structured report, and critiques its own output — revising itself when the critique falls short — built on a real [LangGraph](https://github.com/langchain-ai/langgraph) `StateGraph` with conditional routing, persistent memory, and a live execution view.
 
-> Live demo: `https://meridian-bhn5.onrender.com/`
+> Live demo: https://meridian-bhn5.onrender.com/
 
 ---
 
@@ -18,12 +18,12 @@ An agentic research pipeline that searches the web, reads and synthesizes source
 -->
 
 **Live pipeline execution**
-`<img width="1896" height="1074" alt="image" src="https://github.com/user-attachments/assets/59c4e88d-9a01-4e3c-9599-3db3d3ba8b04" />
-`
+<img width="1896" height="1074" alt="image" src="https://github.com/user-attachments/assets/59c4e88d-9a01-4e3c-9599-3db3d3ba8b04" />
+
 
 **Finished report**
-`<img width="1899" height="1066" alt="image" src="https://github.com/user-attachments/assets/bcc0cb50-07e1-478b-b2a9-f4627f6b3c8f" />
-`
+<img width="1899" height="1066" alt="image" src="https://github.com/user-attachments/assets/bcc0cb50-07e1-478b-b2a9-f4627f6b3c8f" />
+
 
 ---
 
