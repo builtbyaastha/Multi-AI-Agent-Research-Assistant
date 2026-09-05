@@ -3,9 +3,11 @@ Long-term memory layer for the research pipeline.
 
 Stores completed reports in a local Chroma collection, keyed by topic, so
 future related queries can retrieve prior research as extra context instead
-of starting cold every time. Uses sentence-transformers for embeddings
-(already a dependency) rather than an API-based embedding model, so this
-doesn't add cost or a new external dependency.
+of starting cold every time. Uses Chroma's built-in embedding function
+(all-MiniLM-L6-v2 via ONNX Runtime, not PyTorch) rather than an API-based
+embedding model, so this doesn't add cost or a new external dependency —
+and it keeps memory usage low enough to run on a memory-constrained deploy
+target, unlike the PyTorch-based sentence-transformers path.
 
 This is intentionally simple: one collection, one embedding function, no
 chunking. For a research-summary use case the reports are short enough that
@@ -22,9 +24,14 @@ from chromadb.utils import embedding_functions
 _PERSIST_DIR = os.path.join(os.path.dirname(__file__), ".chroma_memory")
 _COLLECTION_NAME = "research_reports"
 
-_embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
-    model_name="all-MiniLM-L6-v2"
-)
+# Uses Chroma's built-in embedding function, which runs the same
+# all-MiniLM-L6-v2 model via ONNX Runtime instead of PyTorch. Same
+# embedding quality, but without pulling in torch — that matters a lot on
+# a memory-constrained deploy target (PyTorch alone can push past a 512MB
+# free-tier container on its own), and it sidesteps the sentence-transformers
+# / huggingface_hub version conflicts you hit locally earlier, since this
+# path doesn't depend on that package at all.
+_embedding_fn = embedding_functions.DefaultEmbeddingFunction()
 
 _client = chromadb.PersistentClient(path=_PERSIST_DIR)
 _collection = _client.get_or_create_collection(
