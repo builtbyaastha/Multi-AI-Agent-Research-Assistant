@@ -29,7 +29,7 @@ LLM_PROVIDER = os.getenv("LLM_PROVIDER", "ollama").lower()
 if LLM_PROVIDER == "gemini":
     from langchain_google_genai import ChatGoogleGenerativeAI
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
+        model="gemini-3.6-flash",
         temperature=0,
         google_api_key=os.getenv("GEMINI_API_KEY"),
     )
