@@ -96,7 +96,6 @@ python eval.py --limit 2          # quick smoke test
 python eval.py --save results.json   # full run, saves results
 ```
 
-`[Add your actual pass rate here once you have a clean run, e.g. "4/5 golden queries pass (80%)" — real numbers, not a placeholder, are what make this section credible.]`
 
 ## Tech stack
 
